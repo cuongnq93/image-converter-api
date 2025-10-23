@@ -5,7 +5,6 @@
   "main": "api/convert.ts",
   "scripts": {
     "dev": "vercel dev",
-    "build": "tsc",
     "deploy": "vercel --prod",
     "test": "node test/test-api.js",
     "test:local": "API_URL=http://localhost:3000 node test/test-api.js",

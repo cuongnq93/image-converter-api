@@ -1,9 +1,4 @@
 {
-  "version": 2,
-  "name": "image-converter-api",
-  "regions": ["sfo1"],
-  "buildCommand": null,
-  "outputDirectory": null,
   "functions": {
     "api/**/*.ts": {
       "maxDuration": 30,
