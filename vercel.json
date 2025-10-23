@@ -1,32 +1,6 @@
 {
   "version": 2,
   "name": "image-converter-api",
-  "builds": [
-    {
-      "src": "api/**/*.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/convert",
-      "dest": "/api/convert.ts",
-      "methods": ["POST", "OPTIONS"]
-    },
-    {
-      "src": "/api/metadata",
-      "dest": "/api/metadata.ts",
-      "methods": ["POST", "OPTIONS"]
-    },
-    {
-      "src": "/api/health",
-      "dest": "/api/health.ts",
-      "methods": ["GET", "OPTIONS"]
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
   "regions": ["sfo1"],
   "functions": {
     "api/**/*.ts": {
