@@ -1,0 +1,36 @@
+{
+  "name": "image-converter-api",
+  "version": "1.0.0",
+  "description": "Vercel serverless API for image conversion and optimization",
+  "main": "api/convert.ts",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "tsc",
+    "deploy": "vercel --prod",
+    "test": "node test/test-api.js",
+    "test:local": "API_URL=http://localhost:3000 node test/test-api.js",
+    "test:prod": "node test/test-api.js"
+  },
+  "keywords": [
+    "image",
+    "converter",
+    "optimization",
+    "sharp",
+    "vercel"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "sharp": "^0.33.5",
+    "busboy": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.19",
+    "@vercel/node": "^3.0.21",
+    "typescript": "^5.3.3",
+    "vercel": "^33.4.1"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}

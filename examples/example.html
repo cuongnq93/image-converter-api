@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Converter API - Example</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .file-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: #fafafa;
+    }
+
+    .file-label:hover {
+      border-color: #667eea;
+      background: #f0f0ff;
+    }
+
+    .file-label.has-file {
+      border-color: #667eea;
+      background: #f0f0ff;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border 0.3s;
+    }
+
+    select:focus, input[type="number"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: #ddd;
+      outline: none;
+    }
+
+    .quality-value {
+      min-width: 40px;
+      text-align: right;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .metadata {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .metadata-item {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .metadata-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .metadata-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .error {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fee;
+      border: 1px solid #fcc;
+      border-radius: 8px;
+      color: #c33;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      display: none;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .config-note {
+      margin-top: 30px;
+      padding: 15px;
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #856404;
+    }
+
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🖼️ Image Converter API</h1>
+    <p class="subtitle">Convert images using Vercel serverless API</p>
+
+    <div class="config-note">
+      ⚠️ <strong>Configuration Required:</strong> Update <code>API_URL</code> in the script below with your Vercel API URL.
+    </div>
+
+    <form id="converterForm">
+      <div class="form-group">
+        <label>Select Image</label>
+        <input type="file" id="fileInput" accept="image/*" required>
+        <label for="fileInput" class="file-label" id="fileLabel">
+          <span id="fileName">📁 Click to select an image</span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="format">Output Format</label>
+        <select id="format" required>
+          <option value="webp">WebP (Recommended)</option>
+          <option value="avif">AVIF (Best compression)</option>
+          <option value="jpeg">JPEG</option>
+          <option value="png">PNG</option>
+          <option value="gif">GIF</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="quality">Quality: <span class="quality-value" id="qualityValue">85</span>%</label>
+        <div class="slider-container">
+          <input type="range" id="quality" min="1" max="100" value="85">
+        </div>
+      </div>
+
+      <button type="submit" id="convertBtn">Convert Image</button>
+    </form>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p style="margin-top: 15px; color: #666;">Converting image...</p>
+    </div>
+
+    <div class="error" id="error"></div>
+
+    <div class="result" id="result">
+      <h3 style="margin-bottom: 15px;">✅ Conversion Complete</h3>
+      <img id="resultImage" alt="Converted image">
+      <div class="metadata" id="metadata"></div>
+    </div>
+  </div>
+
+  <script>
+    // ⚠️ CHANGE THIS TO YOUR VERCEL API URL
+    const API_URL = 'http://localhost:3000'; // Change to: https://your-api.vercel.app
+
+    const fileInput = document.getElementById('fileInput');
+    const fileLabel = document.getElementById('fileLabel');
+    const fileName = document.getElementById('fileName');
+    const form = document.getElementById('converterForm');
+    const qualitySlider = document.getElementById('quality');
+    const qualityValue = document.getElementById('qualityValue');
+    const loading = document.getElementById('loading');
+    const error = document.getElementById('error');
+    const result = document.getElementById('result');
+    const resultImage = document.getElementById('resultImage');
+    const metadata = document.getElementById('metadata');
+
+    // Update quality value
+    qualitySlider.addEventListener('input', (e) => {
+      qualityValue.textContent = e.target.value;
+    });
+
+    // Handle file selection
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        fileName.textContent = `📷 ${file.name}`;
+        fileLabel.classList.add('has-file');
+      }
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const file = fileInput.files[0];
+      if (!file) {
+        showError('Please select an image');
+        return;
+      }
+
+      // Hide previous results
+      result.classList.remove('show');
+      error.classList.remove('show');
+      loading.classList.add('show');
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('format', document.getElementById('format').value);
+        formData.append('quality', qualitySlider.value);
+
+        const response = await fetch(`${API_URL}/api/convert`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showResult(data.result);
+        } else {
+          showError(data.error || 'Conversion failed');
+        }
+      } catch (err) {
+        showError(err.message || 'Failed to connect to API');
+      } finally {
+        loading.classList.remove('show');
+      }
+    });
+
+    function showResult(data) {
+      const { image, metadata: meta } = data;
+
+      // Display image
+      resultImage.src = `data:image/${meta.format};base64,${image}`;
+
+      // Display metadata
+      metadata.innerHTML = `
+        <div class="metadata-item">
+          <div class="metadata-label">Format</div>
+          <div class="metadata-value">${meta.format.toUpperCase()}</div>
+        </div>
+        <div class="metadata-item">
+          <div class="metadata-label">Dimensions</div>
+          <div class="metadata-value">${meta.width} × ${meta.height}</div>
+        </div>
+        <div class="metadata-item">
+          <div class="metadata-label">Original Size</div>
+          <div class="metadata-value">${(meta.originalSize / 1024).toFixed(1)} KB</div>
+        </div>
+        <div class="metadata-item">
+          <div class="metadata-label">New Size</div>
+          <div class="metadata-value">${(meta.size / 1024).toFixed(1)} KB</div>
+        </div>
+        <div class="metadata-item">
+          <div class="metadata-label">Compression</div>
+          <div class="metadata-value">${meta.compressionRatio.toFixed(1)}%</div>
+        </div>
+      `;
+
+      result.classList.add('show');
+    }
+
+    function showError(message) {
+      error.textContent = `❌ Error: ${message}`;
+      error.classList.add('show');
+    }
+  </script>
+</body>
+</html>
